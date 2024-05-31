@@ -23,10 +23,10 @@ def remove_diacritics(text):
 # Funcție pentru preprocesarea textului
 def preprocess_text(text):
     text = remove_diacritics(text)
-    text = re.sub(r'\d+', '', text)
-    text = text.lower()
-    text = re.sub(r'\W', ' ', text)
-    text = re.sub(r'\s+', ' ', text)
+    text = re.sub(r'\d+', '', text) # eliminarea cifrelor
+    text = text.lower() # conversia la litere mici
+    text = re.sub(r'\W', ' ', text) # eliminarea caracterelor alfanumerice
+    text = re.sub(r'\s+', ' ', text) # eliminarea spatiilor multiple
     return text
 
 
@@ -65,14 +65,14 @@ word2vec_model = Word2Vec(sentences=train_sentences, vector_size=100, window=5, 
 
 # Funcție pentru a genera un rezumat folosind modelul Word2Vec
 def summarize(text, model, num_sentences=3):
-    sentences = sent_tokenize(text)
-    sentences = [word_tokenize(remove_diacritics(sentence.lower())) for sentence in sentences]
+    sentences = sent_tokenize(text) # impartirea in propozitii
+    sentences = [word_tokenize(remove_diacritics(sentence.lower())) for sentence in sentences] # impartire propozitiilor in cuvinte si eliminarea diacriticelor
     sentence_vectors = [np.mean([model.wv[word] for word in sentence if word in model.wv] or [np.zeros(100)], axis=0)
-                        for sentence in sentences]
+                        for sentence in sentences] # calcularea vectorilor propozitiilor
 
-    sentence_scores = [np.linalg.norm(vec) for vec in sentence_vectors]
-    ranked_sentences = [sentences[i] for i in np.argsort(sentence_scores)[-num_sentences:]]
-    summary = ' '.join([' '.join(sentence) for sentence in ranked_sentences])
+    sentence_scores = [np.linalg.norm(vec) for vec in sentence_vectors] # calculalea scorului fiecarie propzotii
+    ranked_sentences = [sentences[i] for i in np.argsort(sentence_scores)[-num_sentences:]] # selectarea propozitiilor cu cele mai mari scoruri
+    summary = ' '.join([' '.join(sentence) for sentence in ranked_sentences]) # formarea rezumatului
     return summary
 
 
